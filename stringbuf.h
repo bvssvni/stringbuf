@@ -55,11 +55,6 @@ typedef struct stringbuf
 stringbuf_t *stringbuf_New(int capacity);
 
 //
-// Deletes the string buffer.
-//
-void stringbuf_Delete(stringbuf_t *buf);
-
-//
 // Adds a text to the string buffer.
 //
 void stringbuf_Append(stringbuf_t *buf, const char *text);

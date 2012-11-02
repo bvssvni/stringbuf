@@ -5,6 +5,15 @@
 #include "ref.h"
 #include "stringbuf.h"
 
+void stringbuf_Delete(void *ptr)
+{
+	stringbuf_t *buf = ptr;
+	if (buf->ptr != NULL) {
+		free(buf->ptr);
+		buf->ptr = NULL;
+	}
+}
+
 stringbuf_t *stringbuf_New(int capacity)
 {
 	// Do not start with no capacity.
@@ -12,21 +21,12 @@ stringbuf_t *stringbuf_New(int capacity)
 	
 	gcInit(stringbuf_t, buf,
 		   .cap = capacity,
+		   .ref.destructor = stringbuf_Delete,
 		   .ptr = malloc(capacity * sizeof(char)));
 	memset(buf->ptr, 0, buf->cap * sizeof(char));
 	return buf;
 }
 
-void stringbuf_Delete(stringbuf_t *buf)
-{
-	if (buf == NULL) return;
-	
-	// Release buffer if this is the last reference.
-	if (!buf->ref.keep) {
-		free(buf->ptr);
-		buf->ptr = NULL;
-	}
-}
 
 void stringbuf_Append(stringbuf_t *buf, const char *text)
 {

@@ -8,14 +8,14 @@
 #define func(ns, name) static __typeof__(ns##_##name) * const name = ns##_##name
 
 func(stringbuf, New);
-func(stringbuf, Delete);
 func(stringbuf, Append);
 
 // 2^25 in 5.792s
 void test_stringbuf_1(void)
 {
 	stringbuf_t *buf = New(100);
-	Delete(buf);
+	
+	gcSet(buf, NULL);
 }
 
 // 2^24 in 8.325s
@@ -42,7 +42,6 @@ void test_stringbuf_2(void)
 	
 	// printf("%s\n", buf->ptr);
 	
-	Delete(buf);
 	gcSet(buf, NULL);
 }
 
@@ -50,10 +49,9 @@ void test_stringbuf_3(void)
 {
 	stringbuf_t *a = New(0);
 	stringbuf_t *b = NULL;
+	
 	gcSet(b, a);
-	Delete(a);
 	gcSet(a, NULL);
-	Delete(b);
 	gcSet(b, NULL);
 }
 
@@ -66,19 +64,24 @@ void test_stringbuf_4(void)
 	// Use garbage collector.
 	gcStart(gcRef(a), gcRef(b));
 	
-	// We have to delete the internal buffer before changing value.
-	stringbuf_Delete(b);
-	
-	assert(b->ptr == NULL);
-	
 	gcSet(b, a);
 	
 	assert(b == a);
 	
-	Delete(a);
-	Delete(b);
-	
 	// Clean up.
+	gcEnd();
+}
+
+void test_stringbuf_5(void)
+{
+	stringbuf_t *a = New(100);
+	stringbuf_t *b = New(100);
+	
+	gcStart(gcRef(a), gcRef(b));
+	
+	gcCopy(a, b);
+	a->ptr = NULL;
+	
 	gcEnd();
 }
 
