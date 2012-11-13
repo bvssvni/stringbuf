@@ -1,5 +1,15 @@
+#if 0
+#!/bin/bash
+gcc -o test-stringbuf *.c -Wall -Wfatal-errors -O3
+if [ "$?" = "0" ]; then
+	time ./test-stringbuf
+fi
+exit
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 #include "ref.h"
@@ -9,6 +19,7 @@
 
 func(stringbuf, New);
 func(stringbuf, Append);
+func(stringbuf, AppendChar);
 
 // 2^25 in 5.792s
 void test_stringbuf_1(void)
@@ -85,12 +96,28 @@ void test_stringbuf_5(void)
 	gcEnd();
 }
 
+void test_stringbuf_6(void)
+{
+	stringbuf_t *a = New(0);
+	gcStart(gcRef(a));
+	
+	AppendChar(a, 'a');
+	AppendChar(a, 'b');
+	AppendChar(a, 'c');
+	
+	assert(strcmp(a->ptr, "abc") == 0);
+	
+	gcEnd();
+}
+
 int main(int argc, char *argv[])
 {
 	test_stringbuf_1();
 	test_stringbuf_2();
 	test_stringbuf_3();
 	test_stringbuf_4();
+	test_stringbuf_5();
+	test_stringbuf_6();
 	
 	/*/
 	int i;

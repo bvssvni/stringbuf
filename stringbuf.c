@@ -27,6 +27,37 @@ stringbuf_t *stringbuf_New(int capacity)
 	return buf;
 }
 
+void stringbuf_AppendChar(stringbuf_t *buf, char c)
+{
+	if (buf == NULL) return;
+	if (buf->ptr == NULL) return;
+	
+	int mem = buf->cap - buf->len - 1;
+	
+	if (mem < 1) {
+		// Double until it got room for the text.
+		int expand = buf->cap;
+		while (expand < 1 + buf->len + 1) {
+			expand <<= 1;
+		}
+		
+		// Create new buffer.
+		char *arr = malloc(expand * sizeof(char));
+		memset(arr, 0, expand * sizeof(char));
+		
+		// Copy data from old buffer into new.
+		memcpy(arr, buf->ptr, buf->cap);
+		
+		// Release old buffer.
+		free(buf->ptr);
+		
+		// Replace with new buffer.
+		buf->ptr = arr;
+		buf->cap = expand;
+	}
+	
+	buf->ptr[buf->len++] = c;
+}
 
 void stringbuf_Append(stringbuf_t *buf, const char *text)
 {

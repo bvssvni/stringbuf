@@ -59,4 +59,9 @@ stringbuf_t *stringbuf_New(int capacity);
 //
 void stringbuf_Append(stringbuf_t *buf, const char *text);
 
+//
+// Adds a char to the string buffer.
+//
+void stringbuf_AppendChar(stringbuf_t *buf, char c);
+
 #endif
